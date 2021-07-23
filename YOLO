@@ -1,0 +1,42 @@
+<h3>YOLO</h3>란 You Only Look Once의 약자로 Object Detection 분야에서 많이 알려진 모델입니다.
+
+욜로는 버젼이 YOLO YOLO, YOLOv2, YOLOv3, YOLOv4, YOLOv5까지 다양하게 있습니다. 하지만 모델마다 장단점이 있습니다.
+
+Yolo의 첫 번째 특징은 이미지 전체를 한번만 보는 것이다.
+YOLO 이전의 R-CNN은 이미지를 여러장으로 분할하고, CNN모델을 이용해 이미지를 분석했다.
+그렇기 때문에 이미지 한장에서 Object Detection을 해도 실제로는 여러장의 이미지를 분석하는 것과 같았다.
+하지만 YOLO는 이러한 과정 없이 이미지를 한 번만 보는 강력한 특징을 가지고 있다.  두 번째 특징은 통합된 모델을 사용하는 것이다.
+기존 Object Detectin 모델은 다양한 전처리 모델과 인공 신경망을 결합해서 사용했다. 하지만 YOLO는 통합된 모델을 사용해 간단하다.
+세 번째 특징은 실시간으로 객체를 탐지 할 수 있는 것이다.
+YOLO가 유명해진 이유는 높은 성능은 아니더라도 준수한 성능으로 실시간으로 Object Detection이 가능했기 때문이다.
+기존의 Faster R-CNN보다 6배 빠른 성능을 보여준다.
+
+<h3>YOLO Detection System</h3>
+YOLO는 이미지 픽셀, bounding box, coordinate, class probabilit모두singleregressionproblem으로
+재구성해 이미지를 한 번 보는 것으로 그 안에 어떤 물체들이 있는지, 어디에 있는지 파악할 수 있다.
+아래 이미지와 같이 single convolutional network가 이미지 전체에서 multiple bounding box에 대한 class probability를 계산하는 통합된 모델을 사용한다.
+
+https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FJaqQh%2FbtqF5e5wZIj%2FreerMAyDEV1Ci6Rt7o7HKK%2Fimg.png
+
+grid 이미지 자리
+
+1. 먼저 입력 이미지를 S X S 그리드 영역으로 나눠 준다.
+
+입력 이미지(1)가 네트워크를 통과화면 2개의 데이터(2, 3)를 얻는다.
+
+2. 각각의 grid cell은 B개의 Bounding box와 각 Bounding box에 대한 confidence score를 갖는다. (만약 cell에 Object가 존재하지 않는다면 confidence score는 0이 된다.) confidence score는 이 시스템이 물체를 포함한다는 예측을 얼마나 확신하는지, 박스에 대한 예측이 얼마나 정확할지를 의미한다.
+
+각 그리드에서 중심을 그리드 안쪽으로 하면서 크기가 일정하지 않은 Bounding box 2개를 생성한다.(B = 2) 여기서 그리드 셀이 7x7 = 49이므로  Bounding box는 총98개가 만들어진다.  이 중 Bounding box 안쪽에 어떤 Object가 있을 것 같다고 확신(confidence score)할수록 박스를 굵게 그려진다. 
+
+3. 각각의 bounding box는 x, y , w, h와 confidence로 구성된다.
+
+이 값들은 모두 (0,1)범위의 값으로 정규화
+
+- 예 1: 만약 x가 grid cell의 가장 왼쪽에 있다면 x = 0, y가 grid cell의 중간에 있다면 y=0.5
+
+- 예 2: bbox의 width가 이미지 widht의 절반이라면 w = 0.5
+
+4. 각각의 grid cell은 C(conditional class probability)를 갖는다.  논문에서는 PASCAL VOC데이터셋을 사용하여 class개수는 20개이다. (C = 20)
+
+5. 평가할 때 conditional class probability와 각 박스의 class-specific confidence score를 주는 confidence prediction을 곱했다. 이 점수는 class가 박스안에 존재하는지와 박스가 물체에 얼마나 적합한가를 모두 포함한다.
+
